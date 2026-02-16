@@ -1,0 +1,78 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <style>
+        ul {
+            list-style: none;
+            padding: 0;
+            max-width: fit-content;
+        }
+        .item  {
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+        }
+    </style>
+
+    <h1>Lista de listas</h1>
+
+    <form action="/lists" method="post">
+        {% csrf_token %}
+        <div>
+            <label for="name">Crea una nueva lista:</label>
+            <br>
+            <input type="text" id="name" name="name" autofocus required>
+        </div>
+
+        <input type="submit" value="Crear">
+    </form>
+
+    {% if listas %}
+    <ul>
+        {% for l in listas %}
+        <li class="item">
+            📋
+            <a href="/lists/{{l.id}}/tasks">{{ l.name }}</a>
+
+            <button class="delete" id="{{l.id}}" type="button">X</button>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No listas disponibles.</p>
+    {% endif %}
+
+    <script>
+        const inputTokenEl = document.querySelector('input[name="csrfmiddlewaretoken"]')
+        const token = inputTokenEl.value
+
+        const deleteButtons = document.querySelectorAll('.delete');
+
+        for (const deleteButton of deleteButtons) {
+            deleteButton.addEventListener('click', async (e) => {
+                const listId = e.target.id;
+
+                const resp = await fetch('/lists/' + listId, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': token,
+                        'mode': 'same-origin'
+                    }
+                })
+
+                window.location.href = '';
+            })
+        }
+
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,122 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <style>
+        td:nth-child(2) {
+            text-align: center;
+        }
+    </style>
+
+    <a href="/lists">&lt; Volver a las listas</a>
+
+    <h1>Lista de {{l.name}}</h1>
+
+
+    <form action="/lists/{{l.id}}/tasks" method="post">
+        {% csrf_token %}
+        <div>
+            <label for="title">Crea una nueva tarea:</label>
+            <br>
+            <input type="text" id="title" name="title" autofocus required>
+        </div>
+
+        <input type="submit" value="Crear">
+    </form>
+
+    {% if tasks %}
+    <table>
+
+        <thead>
+            <th>Tarea</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </thead>
+        <tbody>
+            {% for t in tasks %}
+            <tr>
+                <td>{{ t.title }}</td>
+                <td>
+                    {% if t.complated %}
+                        🟢
+                    {% else %}
+                        🔴
+                    {% endif %}
+                </td>
+
+                <td>
+                    <input id="{{t.id}}" class="patch" data-path="/lists/{{l.id}}/tasks/{{t.id}}" type="checkbox" 
+                    {% if t.complated %} checked {% endif %}
+                    >
+                    <button class="delete" data-path="/lists/{{l.id}}/tasks/{{t.id}}" type="button">X</button>
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No listas disponibles.</p>
+    {% endif %}
+
+    <script>
+        const inputTokenEl = document.querySelector('input[name="csrfmiddlewaretoken"]')
+        const token = inputTokenEl.value
+
+        const deleteButtons = document.querySelectorAll('.delete');
+
+        for (const deleteButton of deleteButtons) {
+            deleteButton.addEventListener('click', async (e) => {
+                const taskPath = e.target.getAttribute('data-path');
+
+                const resp = await fetch(taskPath, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': token,
+                        'mode': 'same-origin'
+                    }
+                })
+
+                window.location.href = '';
+            })
+        }
+
+
+        const patchButtons = document.querySelectorAll('.patch');
+
+        for (const patchButton of patchButtons) {
+
+            patchButton.addEventListener('click', async (e) => {
+                const taskPath = e.target.getAttribute('data-path');
+                const status = e.target.getAttribute('checked') == '' ? false : true;
+
+                console.log(status);
+
+
+                const resp = await fetch(taskPath, {
+                    method: 'PATCH',
+                    headers: {
+
+                        'X-CSRFToken': token,
+                        'mode': 'same-origin'
+                    },
+                    body: JSON.stringify({
+                        status: status
+                    })
+                })
+
+                window.location.href = '';
+            })
+        }
+
+
+    </script>
+</body>
+
+</html>

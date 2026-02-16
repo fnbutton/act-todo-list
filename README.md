@@ -22,23 +22,17 @@ source venv/bin/activate  # En Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 5. Navegar a la carpeta del proyecto
-
-```bash
-cd project
-```
-
 ### 6. Configurar la base de datos
 
 ```bash
-python manage.py project/migrate
+python project/manage.py migrate
 ```
 
 
 ### 7. Ejecutar el servidor
 
 ```bash
-python manage.py project/runserver
+python project/manage.py runserver
 ```
 
 El servidor estará disponible en `http://localhost:8000`

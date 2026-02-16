@@ -4,7 +4,11 @@ from django.shortcuts import render, redirect
 from .models import Task, TaskList
 
 def index(request, id_list):
-    task_list = TaskList.objects.get(pk=id_list)
+    try:
+        task_list = TaskList.objects.get(pk=id_list)
+    except Exception as e:
+        print(e)
+        return redirect('/lists')
 
     if request.method == 'POST':
         try:
